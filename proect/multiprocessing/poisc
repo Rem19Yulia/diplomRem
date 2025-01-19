@@ -1,0 +1,43 @@
+import requests
+from bs4 import BeautifulSoup
+from multiprocessing import Pool
+
+
+# Функция для выполнения поиска и парсинга результатов
+def search_query(query):
+    url = f'https://duckduckgo.com/?q={query}'
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Проверка на успешный ответ (код 200)
+    except requests.RequestException as e:
+        print(f"Ошибка при выполнении запроса для '{query}': {e}")
+        return []  # Возвращаем пустой список в случае ошибки
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Извлечение заголовков результатов поиска
+    results = []
+    for item in soup.find_all('a', class_='result__a'):
+        title = item.get_text()
+        link = item['href']
+        results.append((title, link))
+
+    return results
+
+
+if __name__ == '__main__':
+    # Запрос от пользователя
+    user_query = input("Введите ваш поисковый запрос: ")
+
+    # Разделение запроса на отдельные слова для параллельного поиска
+    queries = user_query.split()
+
+    # Создание пула процессов
+    with Pool(processes=4) as pool:  # Укажите количество процессов
+        results = pool.map(search_query, queries)
+
+    # Вывод результатов
+    for i, query_results in enumerate(results):
+        print(f'Результаты для "{queries[i]}":')
+        for title, link in query_results:
+            print(f' - {title}: {link}')
