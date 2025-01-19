@@ -1,0 +1,19 @@
+# Функция для обновления метки с изображением
+def update_image(photo):
+    label.config(image=photo)
+    label.image = photo  # Сохранение ссылки на изображение
+
+# Создание основного окна
+root = tk.Tk()
+root.title("Загрузка изображения с использованием потоков")
+
+# Кнопка для загрузки изображения
+upload_button = tk.Button(root, text="Загрузить изображение", command=upload_image)
+upload_button.pack(pady=20)
+
+# Метка для отображения изображения
+label = tk.Label(root)
+label.pack(pady=20)
+
+# Запуск основного цикла интерфейса
+root.mainloop()
